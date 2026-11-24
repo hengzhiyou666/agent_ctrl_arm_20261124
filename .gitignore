@@ -1,0 +1,29 @@
+# Local dependencies and generated runs
+/CaPtain-Harness/
+/.venv*/
+/runs/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+
+# Weights and local configuration
+/models/
+/qwen3.5_4b/
+*.safetensors
+*.gguf
+*.ggml
+*.pt
+*.pth
+*.ckpt
+*.onnx
+*.bin
+.env
+.env.*
+
+# Recordings and archives
+*.mp4
+*.gif
+*.log
+*.tar.gz
+*.zip
