@@ -1,0 +1,1087 @@
+{
+  "snapshot_at": "2026-11-26T18:20:50+08:00",
+  "run": "LIBERO-Object, Qwen 3.5 4B with live monitor, 2026-11-26",
+  "baseline": "Previous LIBERO-Object run (same 500 task/state pairs)",
+  "output_key": "tool-agent-audit",
+  "run_source_sha256": "09baa63dde964359a6c6e4359701d1cd4fbd1ba13810ef30fa4edfc926e2c842",
+  "planned": 500,
+  "ledger_status": {
+    "scored": 500
+  },
+  "final": true,
+  "baseline_ledger_status": {
+    "scored": 500
+  },
+  "baseline_total_successes": 293,
+  "official": {
+    "success": 496,
+    "model_responses": 13430,
+    "turns_without_dispatch": 29,
+    "provider_linked_tool_calls": 13401,
+    "provider_reused_response_id_matched_by_turn": 281,
+    "failure": 4
+  },
+  "paired_baseline": {
+    "both_success": 290,
+    "regressed": 3,
+    "improved": 206,
+    "both_failed": 1
+  },
+  "model_visual": {
+    "both_success": 469,
+    "official_only_success": 27,
+    "both_failed": 4
+  },
+  "agent_stop": {
+    "report_accepted/placed": 469,
+    "report_accepted/blocked": 24,
+    "turn_budget/blocked": 7
+  },
+  "tasks": {
+    "0": {
+      "verdicts": {
+        "success": 50
+      },
+      "paired_baseline": {
+        "both_success": 50
+      },
+      "visual": {
+        "both_success": 48,
+        "official_only_success": 2
+      },
+      "failures": {},
+      "recovery": {
+        "signal_seen": 2,
+        "followup_observed": 2,
+        "success_after_observed_followup": 2
+      },
+      "status": {
+        "scored": 50
+      }
+    },
+    "1": {
+      "verdicts": {
+        "success": 48,
+        "failure": 2
+      },
+      "paired_baseline": {
+        "both_success": 45,
+        "regressed": 1,
+        "improved": 3,
+        "both_failed": 1
+      },
+      "visual": {
+        "both_success": 27,
+        "both_failed": 2,
+        "official_only_success": 21
+      },
+      "failures": {
+        "control_budget": 2
+      },
+      "recovery": {
+        "signal_seen": 24,
+        "followup_observed": 24,
+        "success_after_observed_followup": 22
+      },
+      "status": {
+        "scored": 50
+      }
+    },
+    "2": {
+      "verdicts": {
+        "success": 50
+      },
+      "paired_baseline": {
+        "improved": 50
+      },
+      "visual": {
+        "both_success": 50
+      },
+      "failures": {},
+      "recovery": {},
+      "status": {
+        "scored": 50
+      }
+    },
+    "3": {
+      "verdicts": {
+        "failure": 1,
+        "success": 49
+      },
+      "paired_baseline": {
+        "regressed": 1,
+        "both_success": 49
+      },
+      "visual": {
+        "both_failed": 1,
+        "both_success": 49
+      },
+      "failures": {
+        "bad_initial_frame_id": 1
+      },
+      "recovery": {},
+      "status": {
+        "scored": 50
+      }
+    },
+    "4": {
+      "verdicts": {
+        "success": 50
+      },
+      "paired_baseline": {
+        "improved": 50
+      },
+      "visual": {
+        "both_success": 50
+      },
+      "failures": {},
+      "recovery": {},
+      "status": {
+        "scored": 50
+      }
+    },
+    "5": {
+      "verdicts": {
+        "success": 50
+      },
+      "paired_baseline": {
+        "both_success": 50
+      },
+      "visual": {
+        "both_success": 48,
+        "official_only_success": 2
+      },
+      "failures": {},
+      "recovery": {
+        "signal_seen": 2,
+        "followup_observed": 2,
+        "success_after_observed_followup": 2
+      },
+      "status": {
+        "scored": 50
+      }
+    },
+    "6": {
+      "verdicts": {
+        "success": 49,
+        "failure": 1
+      },
+      "paired_baseline": {
+        "both_success": 46,
+        "regressed": 1,
+        "improved": 3
+      },
+      "visual": {
+        "both_success": 49,
+        "both_failed": 1
+      },
+      "failures": {
+        "turn_budget": 1
+      },
+      "recovery": {},
+      "status": {
+        "scored": 50
+      }
+    },
+    "7": {
+      "verdicts": {
+        "success": 50
+      },
+      "paired_baseline": {
+        "improved": 50
+      },
+      "visual": {
+        "both_success": 50
+      },
+      "failures": {},
+      "recovery": {},
+      "status": {
+        "scored": 50
+      }
+    },
+    "8": {
+      "verdicts": {
+        "success": 50
+      },
+      "paired_baseline": {
+        "both_success": 50
+      },
+      "visual": {
+        "both_success": 50
+      },
+      "failures": {},
+      "recovery": {},
+      "status": {
+        "scored": 50
+      }
+    },
+    "9": {
+      "verdicts": {
+        "success": 50
+      },
+      "paired_baseline": {
+        "improved": 50
+      },
+      "visual": {
+        "both_success": 48,
+        "official_only_success": 2
+      },
+      "failures": {},
+      "recovery": {
+        "signal_seen": 2,
+        "followup_observed": 2,
+        "success_after_observed_followup": 2
+      },
+      "status": {
+        "scored": 50
+      }
+    }
+  },
+  "failures": [
+    {
+      "task_id": 1,
+      "seed": 1,
+      "category": "control_budget",
+      "agent_reason": "The agent reached the 44-turn budget. Last rejected action: LIBERO horizon exhausted",
+      "control_steps": 280,
+      "replay": "replays/task_01/failure/state_01/pick-place.gif",
+      "tool_events": "evidence/failures/task_01/state_01/events.jsonl"
+    },
+    {
+      "task_id": 1,
+      "seed": 49,
+      "category": "control_budget",
+      "agent_reason": "The agent reached the 44-turn budget. Last rejected action: A grasp may still be held. Use its lift waypoint or deliberately release before retreating.",
+      "control_steps": 280,
+      "replay": "replays/task_01/failure/state_49/pick-place.gif",
+      "tool_events": "evidence/failures/task_01/state_49/events.jsonl"
+    },
+    {
+      "task_id": 3,
+      "seed": 0,
+      "category": "bad_initial_frame_id",
+      "agent_reason": "The agent reached the 44-turn budget. Last rejected action: unknown frame_id; capture a frame with observe",
+      "control_steps": 0,
+      "replay": "replays/task_03/failure/state_00/pick-place.gif",
+      "tool_events": "evidence/failures/task_03/state_00/events.jsonl"
+    },
+    {
+      "task_id": 6,
+      "seed": 8,
+      "category": "turn_budget",
+      "agent_reason": "The agent reached the 44-turn budget. Last rejected action: This frame is missing or stale. Use a new observe frame or omit frame_id.",
+      "control_steps": 150,
+      "replay": "replays/task_06/failure/state_08/pick-place.gif",
+      "tool_events": "evidence/failures/task_06/state_08/events.jsonl"
+    }
+  ],
+  "recovery": {
+    "totals": {
+      "signal_seen": 30,
+      "followup_observed": 30,
+      "success_after_observed_followup": 28
+    },
+    "episodes_with_signals": [
+      {
+        "task_id": 0,
+        "seed": 24,
+        "events": "task_00/state_24/attempt_001/events.jsonl",
+        "signals": {
+          "placement_uncertain": 2
+        },
+        "first_turn": 22,
+        "first_tool": "verify_place",
+        "followup_tools": [
+          "observe",
+          "inspect_place",
+          "diagnose_drop",
+          "recall_attempts"
+        ],
+        "attempted": true,
+        "official_success_after_observed_followup": true
+      },
+      {
+        "task_id": 0,
+        "seed": 38,
+        "events": "task_00/state_38/attempt_001/events.jsonl",
+        "signals": {
+          "placement_uncertain": 2
+        },
+        "first_turn": 22,
+        "first_tool": "verify_place",
+        "followup_tools": [
+          "observe",
+          "inspect_place",
+          "diagnose_drop",
+          "recall_attempts"
+        ],
+        "attempted": true,
+        "official_success_after_observed_followup": true
+      },
+      {
+        "task_id": 1,
+        "seed": 1,
+        "events": "task_01/state_01/attempt_001/events.jsonl",
+        "signals": {
+          "physical_action": 1
+        },
+        "first_turn": 21,
+        "first_tool": "move_arm",
+        "followup_tools": [
+          "retreat_arm",
+          "observe",
+          "detect_object",
+          "locate_object"
+        ],
+        "attempted": true,
+        "official_success_after_observed_followup": false
+      },
+      {
+        "task_id": 1,
+        "seed": 3,
+        "events": "task_01/state_03/attempt_001/events.jsonl",
+        "signals": {
+          "placement_uncertain": 2
+        },
+        "first_turn": 23,
+        "first_tool": "verify_place",
+        "followup_tools": [
+          "observe",
+          "inspect_place",
+          "diagnose_drop",
+          "recall_attempts"
+        ],
+        "attempted": true,
+        "official_success_after_observed_followup": true
+      },
+      {
+        "task_id": 1,
+        "seed": 5,
+        "events": "task_01/state_05/attempt_001/events.jsonl",
+        "signals": {
+          "physical_action": 1
+        },
+        "first_turn": 20,
+        "first_tool": "set_gripper",
+        "followup_tools": [
+          "inspect_place",
+          "observe"
+        ],
+        "attempted": true,
+        "official_success_after_observed_followup": true
+      },
+      {
+        "task_id": 1,
+        "seed": 7,
+        "events": "task_01/state_07/attempt_001/events.jsonl",
+        "signals": {
+          "placement_uncertain": 2
+        },
+        "first_turn": 23,
+        "first_tool": "verify_place",
+        "followup_tools": [
+          "observe",
+          "inspect_place",
+          "recall_attempts"
+        ],
+        "attempted": true,
+        "official_success_after_observed_followup": true
+      },
+      {
+        "task_id": 1,
+        "seed": 11,
+        "events": "task_01/state_11/attempt_001/events.jsonl",
+        "signals": {
+          "physical_action": 2
+        },
+        "first_turn": 9,
+        "first_tool": "move_arm",
+        "followup_tools": [
+          "retreat_arm",
+          "observe",
+          "detect_object",
+          "locate_object",
+          "propose_grasps",
+          "check_grasps",
+          "check_grip",
+          "inspect_place"
+        ],
+        "attempted": true,
+        "official_success_after_observed_followup": true
+      },
+      {
+        "task_id": 1,
+        "seed": 14,
+        "events": "task_01/state_14/attempt_001/events.jsonl",
+        "signals": {
+          "physical_action": 1
+        },
+        "first_turn": 20,
+        "first_tool": "set_gripper",
+        "followup_tools": [
+          "inspect_place",
+          "observe"
+        ],
+        "attempted": true,
+        "official_success_after_observed_followup": true
+      },
+      {
+        "task_id": 1,
+        "seed": 16,
+        "events": "task_01/state_16/attempt_001/events.jsonl",
+        "signals": {
+          "placement_uncertain": 2
+        },
+        "first_turn": 23,
+        "first_tool": "verify_place",
+        "followup_tools": [
+          "observe",
+          "retreat_arm",
+          "inspect_place",
+          "recall_attempts",
+          "diagnose_drop"
+        ],
+        "attempted": true,
+        "official_success_after_observed_followup": true
+      },
+      {
+        "task_id": 1,
+        "seed": 18,
+        "events": "task_01/state_18/attempt_001/events.jsonl",
+        "signals": {
+          "placement_uncertain": 2
+        },
+        "first_turn": 22,
+        "first_tool": "verify_place",
+        "followup_tools": [
+          "observe",
+          "inspect_place",
+          "diagnose_drop",
+          "recall_attempts"
+        ],
+        "attempted": true,
+        "official_success_after_observed_followup": true
+      },
+      {
+        "task_id": 1,
+        "seed": 19,
+        "events": "task_01/state_19/attempt_001/events.jsonl",
+        "signals": {
+          "placement_uncertain": 2
+        },
+        "first_turn": 22,
+        "first_tool": "verify_place",
+        "followup_tools": [
+          "observe",
+          "inspect_place",
+          "diagnose_drop",
+          "recall_attempts"
+        ],
+        "attempted": true,
+        "official_success_after_observed_followup": true
+      },
+      {
+        "task_id": 1,
+        "seed": 20,
+        "events": "task_01/state_20/attempt_001/events.jsonl",
+        "signals": {
+          "placement_uncertain": 2
+        },
+        "first_turn": 23,
+        "first_tool": "verify_place",
+        "followup_tools": [
+          "observe",
+          "inspect_place",
+          "recall_attempts",
+          "diagnose_drop"
+        ],
+        "attempted": true,
+        "official_success_after_observed_followup": true
+      },
+      {
+        "task_id": 1,
+        "seed": 21,
+        "events": "task_01/state_21/attempt_001/events.jsonl",
+        "signals": {
+          "physical_action": 1
+        },
+        "first_turn": 20,
+        "first_tool": "set_gripper",
+        "followup_tools": [
+          "inspect_place",
+          "observe"
+        ],
+        "attempted": true,
+        "official_success_after_observed_followup": true
+      },
+      {
+        "task_id": 1,
+        "seed": 25,
+        "events": "task_01/state_25/attempt_001/events.jsonl",
+        "signals": {
+          "placement_uncertain": 2
+        },
+        "first_turn": 22,
+        "first_tool": "verify_place",
+        "followup_tools": [
+          "observe",
+          "inspect_place",
+          "diagnose_drop",
+          "recall_attempts"
+        ],
+        "attempted": true,
+        "official_success_after_observed_followup": true
+      },
+      {
+        "task_id": 1,
+        "seed": 26,
+        "events": "task_01/state_26/attempt_001/events.jsonl",
+        "signals": {
+          "placement_uncertain": 2
+        },
+        "first_turn": 23,
+        "first_tool": "verify_place",
+        "followup_tools": [
+          "observe",
+          "inspect_place",
+          "recall_attempts"
+        ],
+        "attempted": true,
+        "official_success_after_observed_followup": true
+      },
+      {
+        "task_id": 1,
+        "seed": 27,
+        "events": "task_01/state_27/attempt_001/events.jsonl",
+        "signals": {
+          "placement_uncertain": 2
+        },
+        "first_turn": 22,
+        "first_tool": "verify_place",
+        "followup_tools": [
+          "observe",
+          "inspect_place",
+          "diagnose_drop",
+          "recall_attempts"
+        ],
+        "attempted": true,
+        "official_success_after_observed_followup": true
+      },
+      {
+        "task_id": 1,
+        "seed": 28,
+        "events": "task_01/state_28/attempt_001/events.jsonl",
+        "signals": {
+          "placement_uncertain": 2
+        },
+        "first_turn": 22,
+        "first_tool": "verify_place",
+        "followup_tools": [
+          "observe",
+          "inspect_place",
+          "diagnose_drop",
+          "recall_attempts"
+        ],
+        "attempted": true,
+        "official_success_after_observed_followup": true
+      },
+      {
+        "task_id": 1,
+        "seed": 29,
+        "events": "task_01/state_29/attempt_001/events.jsonl",
+        "signals": {
+          "placement_uncertain": 2
+        },
+        "first_turn": 22,
+        "first_tool": "verify_place",
+        "followup_tools": [
+          "observe",
+          "inspect_place",
+          "diagnose_drop",
+          "recall_attempts"
+        ],
+        "attempted": true,
+        "official_success_after_observed_followup": true
+      },
+      {
+        "task_id": 1,
+        "seed": 30,
+        "events": "task_01/state_30/attempt_001/events.jsonl",
+        "signals": {
+          "placement_uncertain": 1
+        },
+        "first_turn": 31,
+        "first_tool": "verify_place",
+        "followup_tools": [
+          "observe",
+          "recall_attempts",
+          "diagnose_drop"
+        ],
+        "attempted": true,
+        "official_success_after_observed_followup": true
+      },
+      {
+        "task_id": 1,
+        "seed": 34,
+        "events": "task_01/state_34/attempt_001/events.jsonl",
+        "signals": {
+          "placement_uncertain": 2
+        },
+        "first_turn": 23,
+        "first_tool": "verify_place",
+        "followup_tools": [
+          "observe",
+          "inspect_place",
+          "recall_attempts",
+          "diagnose_drop"
+        ],
+        "attempted": true,
+        "official_success_after_observed_followup": true
+      },
+      {
+        "task_id": 1,
+        "seed": 39,
+        "events": "task_01/state_39/attempt_001/events.jsonl",
+        "signals": {
+          "placement_uncertain": 2
+        },
+        "first_turn": 22,
+        "first_tool": "verify_place",
+        "followup_tools": [
+          "observe",
+          "inspect_place",
+          "diagnose_drop",
+          "recall_attempts"
+        ],
+        "attempted": true,
+        "official_success_after_observed_followup": true
+      },
+      {
+        "task_id": 1,
+        "seed": 40,
+        "events": "task_01/state_40/attempt_001/events.jsonl",
+        "signals": {
+          "placement_uncertain": 2
+        },
+        "first_turn": 22,
+        "first_tool": "verify_place",
+        "followup_tools": [
+          "observe",
+          "inspect_place",
+          "diagnose_drop",
+          "recall_attempts"
+        ],
+        "attempted": true,
+        "official_success_after_observed_followup": true
+      },
+      {
+        "task_id": 1,
+        "seed": 41,
+        "events": "task_01/state_41/attempt_001/events.jsonl",
+        "signals": {
+          "placement_uncertain": 2
+        },
+        "first_turn": 23,
+        "first_tool": "verify_place",
+        "followup_tools": [
+          "observe",
+          "inspect_place",
+          "recall_attempts",
+          "diagnose_drop"
+        ],
+        "attempted": true,
+        "official_success_after_observed_followup": true
+      },
+      {
+        "task_id": 1,
+        "seed": 44,
+        "events": "task_01/state_44/attempt_001/events.jsonl",
+        "signals": {
+          "placement_uncertain": 2
+        },
+        "first_turn": 22,
+        "first_tool": "verify_place",
+        "followup_tools": [
+          "observe",
+          "inspect_place",
+          "diagnose_drop",
+          "recall_attempts"
+        ],
+        "attempted": true,
+        "official_success_after_observed_followup": true
+      },
+      {
+        "task_id": 1,
+        "seed": 46,
+        "events": "task_01/state_46/attempt_001/events.jsonl",
+        "signals": {
+          "placement_uncertain": 2
+        },
+        "first_turn": 23,
+        "first_tool": "verify_place",
+        "followup_tools": [
+          "observe",
+          "inspect_place",
+          "recall_attempts"
+        ],
+        "attempted": true,
+        "official_success_after_observed_followup": true
+      },
+      {
+        "task_id": 1,
+        "seed": 49,
+        "events": "task_01/state_49/attempt_001/events.jsonl",
+        "signals": {
+          "physical_action": 3
+        },
+        "first_turn": 10,
+        "first_tool": "move_arm",
+        "followup_tools": [
+          "retreat_arm",
+          "observe",
+          "detect_object",
+          "locate_object",
+          "propose_grasps",
+          "check_grasps",
+          "check_grip"
+        ],
+        "attempted": true,
+        "official_success_after_observed_followup": false
+      },
+      {
+        "task_id": 5,
+        "seed": 23,
+        "events": "task_05/state_23/attempt_001/events.jsonl",
+        "signals": {
+          "placement_uncertain": 1
+        },
+        "first_turn": 23,
+        "first_tool": "verify_place",
+        "followup_tools": [
+          "observe",
+          "diagnose_drop",
+          "recall_attempts",
+          "detect_object"
+        ],
+        "attempted": true,
+        "official_success_after_observed_followup": true
+      },
+      {
+        "task_id": 5,
+        "seed": 27,
+        "events": "task_05/state_27/attempt_001/events.jsonl",
+        "signals": {
+          "placement_uncertain": 2
+        },
+        "first_turn": 23,
+        "first_tool": "verify_place",
+        "followup_tools": [
+          "observe",
+          "inspect_place",
+          "diagnose_drop",
+          "recall_attempts"
+        ],
+        "attempted": true,
+        "official_success_after_observed_followup": true
+      },
+      {
+        "task_id": 9,
+        "seed": 8,
+        "events": "task_09/state_08/attempt_001/events.jsonl",
+        "signals": {
+          "placement_uncertain": 3
+        },
+        "first_turn": 33,
+        "first_tool": "verify_place",
+        "followup_tools": [
+          "observe",
+          "inspect_place",
+          "recall_attempts",
+          "diagnose_drop"
+        ],
+        "attempted": true,
+        "official_success_after_observed_followup": true
+      },
+      {
+        "task_id": 9,
+        "seed": 27,
+        "events": "task_09/state_27/attempt_001/events.jsonl",
+        "signals": {
+          "placement_uncertain": 2
+        },
+        "first_turn": 35,
+        "first_tool": "verify_place",
+        "followup_tools": [
+          "observe",
+          "inspect_place",
+          "diagnose_drop",
+          "recall_attempts"
+        ],
+        "attempted": true,
+        "official_success_after_observed_followup": true
+      }
+    ]
+  },
+  "tools": {
+    "calls": {
+      "observe": 1994,
+      "detect_object": 549,
+      "locate_object": 543,
+      "locate_basket": 632,
+      "propose_grasps": 567,
+      "check_grasps": 505,
+      "plan_motion": 634,
+      "move_arm": 2000,
+      "set_gripper": 994,
+      "check_grip": 1957,
+      "inspect_place": 521,
+      "verify_place": 546,
+      "finish_task": 500,
+      "segment_object": 393,
+      "diagnose_drop": 22,
+      "recall_attempts": 24,
+      "estimate_weight": 218,
+      "reconstruct_shape": 350,
+      "move_wrist_view": 270,
+      "retreat_arm": 7,
+      "test_lift": 48,
+      "find_ridge": 95,
+      "estimate_grip_force": 32
+    },
+    "episodes": {
+      "check_grasps": 499,
+      "locate_object": 500,
+      "inspect_place": 496,
+      "finish_task": 495,
+      "locate_basket": 499,
+      "set_gripper": 498,
+      "move_arm": 499,
+      "check_grip": 498,
+      "observe": 500,
+      "plan_motion": 499,
+      "detect_object": 500,
+      "propose_grasps": 499,
+      "verify_place": 496,
+      "segment_object": 389,
+      "diagnose_drop": 22,
+      "recall_attempts": 24,
+      "reconstruct_shape": 128,
+      "estimate_weight": 218,
+      "move_wrist_view": 128,
+      "retreat_arm": 4,
+      "test_lift": 48,
+      "find_ridge": 95,
+      "estimate_grip_force": 32
+    },
+    "first_tool": {
+      "observe": 460,
+      "locate_basket": 32,
+      "locate_object": 8
+    },
+    "distinct_sequences": 107,
+    "status": {
+      "observe": {
+        "ok": 1994
+      },
+      "detect_object": {
+        "ok": 515,
+        "tool_rejected": 34
+      },
+      "locate_object": {
+        "ok": 507,
+        "tool_rejected": 36
+      },
+      "locate_basket": {
+        "ok": 632
+      },
+      "propose_grasps": {
+        "ok": 505,
+        "tool_rejected": 62
+      },
+      "check_grasps": {
+        "ok": 505
+      },
+      "plan_motion": {
+        "ok": 503,
+        "tool_rejected": 131
+      },
+      "move_arm": {
+        "waypoint_reached": 1994,
+        "motion_failed": 6
+      },
+      "set_gripper": {
+        "gripper_command_completed": 991,
+        "gripper_command_failed": 3
+      },
+      "check_grip": {
+        "tool_rejected": 901,
+        "possible_grip": 516,
+        "gripped": 540
+      },
+      "inspect_place": {
+        "ok": 521
+      },
+      "verify_place": {
+        "inside": 469,
+        "uncertain": 47,
+        "tool_rejected": 30
+      },
+      "finish_task": {
+        "report_accepted": 493,
+        "tool_rejected": 7
+      },
+      "segment_object": {
+        "ok": 393
+      },
+      "diagnose_drop": {
+        "uncertain": 21,
+        "still_gripped": 1
+      },
+      "recall_attempts": {
+        "ok": 24
+      },
+      "estimate_weight": {
+        "scenario_estimate": 218
+      },
+      "reconstruct_shape": {
+        "tool_rejected": 220,
+        "ok": 130
+      },
+      "move_wrist_view": {
+        "viewpoint_reached": 259,
+        "motion_failed": 11
+      },
+      "retreat_arm": {
+        "retreated": 6,
+        "tool_rejected": 1
+      },
+      "test_lift": {
+        "test_lift_reached": 48
+      },
+      "find_ridge": {
+        "hypothesis": 95
+      },
+      "estimate_grip_force": {
+        "conditional_estimate": 32
+      }
+    },
+    "rejections": {
+      "check_grip": {
+        "This frame is missing or stale. Use a new observe frame or omit frame_id.": 901
+      },
+      "verify_place": {
+        "Use inspect_place after completing a release at the basket.": 30
+      },
+      "locate_object": {
+        "unknown detection_id; call detect_object first": 33,
+        "frame is stale after robot motion; observe and detect again": 3
+      },
+      "reconstruct_shape": {
+        "Captured wrist views for o1: none. Move to a different wrist view and observe it before reconstructing.": 129,
+        "Captured wrist views for o1: center. Move to a different wrist view and observe it before reconstructing.": 85,
+        "Captured wrist views for o2: none. Move to a different wrist view and observe it before reconstructing.": 5,
+        "Captured wrist views for o1: left. Move to a different wrist view and observe it before reconstructing.": 1
+      },
+      "plan_motion": {
+        "Basket estimate is stale. Observe and locate it again before planning.": 131
+      },
+      "move_arm": {
+        "OSC_POSE command exceeded 160 control steps": 1,
+        "OSC_POSE stalled before the requested pose (position residual 0.022547 m, orientation residual 0.044549 rad)": 1,
+        "OSC_POSE stalled before the requested pose (position residual 0.022625 m, orientation residual 0.046148 rad)": 1,
+        "OSC_POSE stalled before the requested pose (position residual 0.023160 m, orientation residual 0.045673 rad)": 1,
+        "OSC_POSE stalled before the requested pose (position residual 0.023279 m, orientation residual 0.046440 rad)": 1,
+        "LIBERO horizon exhausted": 1
+      },
+      "propose_grasps": {
+        "Use a shape_id reconstructed for this object_id.": 51,
+        "Invalid shape_id. Use the specified value or copy its ID from a tool receipt.": 11
+      },
+      "move_wrist_view": {
+        "LIBERO horizon exhausted": 10,
+        "OSC_POSE stalled before the requested pose (position residual 0.002609 m, orientation residual 0.007650 rad)": 1
+      },
+      "set_gripper": {
+        "LIBERO horizon exhausted": 3
+      },
+      "retreat_arm": {
+        "A grasp may still be held. Use its lift waypoint or deliberately release before retreating.": 1
+      },
+      "detect_object": {
+        "unknown frame_id; capture a frame with observe": 24,
+        "RGB segmentation did not find a large enough matching component": 10
+      },
+      "finish_task": {
+        "Placement evidence is uncertain. Look again, recover, or report blocked.": 7
+      }
+    },
+    "actuated_strategies": {
+      "top_down": 303,
+      "higher_top_down": 200
+    },
+    "episodes_by_strategy": {
+      "top_down": 299,
+      "higher_top_down": 200
+    }
+  },
+  "monitor": {
+    "counts": {
+      "enabled_episodes": 500,
+      "episodes_with_records": 499,
+      "dispatched": 3319,
+      "interruptible_snapshot": 2325,
+      "actions_with_requests": 3308,
+      "motion_continued": 1
+    },
+    "events": {
+      "action_started": 3319,
+      "request_dispatched": 3319,
+      "action_ended": 3319,
+      "request_completed": 3319,
+      "request_ignored": 3318,
+      "motion_continued": 1
+    },
+    "ignored": {
+      "action_already_ended": 3308,
+      "snapshot_expired": 10
+    },
+    "errors": {
+      "model request failed after 1 attempts: timeout waiting for the chat completion": 3297,
+      "Expected exactly one review_motion decision.": 1
+    },
+    "decisions": {
+      "continue": 21
+    },
+    "completion_seconds": {
+      "n": 3319,
+      "p50": 3.214,
+      "p95": 3.234,
+      "max": 3.305
+    },
+    "successful_response_seconds": {
+      "n": 21,
+      "p50": 2.848,
+      "p95": 2.992,
+      "max": 2.997
+    },
+    "applied_response_age_seconds": {
+      "n": 1,
+      "p50": 1.261,
+      "p95": 1.261,
+      "max": 1.261
+    }
+  },
+  "episode_seconds": {
+    "n": 500,
+    "p50": 146.629,
+    "p95": 230.635,
+    "max": 283.103
+  },
+  "model_response_seconds": {
+    "n": 13430,
+    "p50": 5.512,
+    "p95": 7.392,
+    "max": 9.523
+  },
+  "issues": []
+}

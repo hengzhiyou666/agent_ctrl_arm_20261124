@@ -1,0 +1,15 @@
+{
+  "name": "Franka Panda parallel-jaw gripper",
+  "source": "robosuite/models/assets/grippers/panda_gripper.xml",
+  "frame": "LIBERO gripper0_eef (grip_site)",
+  "per_finger_travel_m": 0.04,
+  "max_pad_gap_m": 0.079,
+  "recommended_grip_span_m": 0.075,
+  "pad_face_width_m": 0.016,
+  "pad_face_depth_m": 0.016,
+  "pad_thickness_m": 0.008,
+  "pad_axial_bounds_from_tcp_m": [-0.0116, 0.0044],
+  "finger_base_from_pad_center_m": 0.041,
+  "tcp_offset_from_gripper_origin_m": 0.097,
+  "insertion_depth": "The 41 mm distance from pad center to finger base is a conservative screen for object material between the fingers. The usable insertion depends on the local shape, finger envelope and approach."
+}

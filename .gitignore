@@ -1,6 +1,9 @@
 # Local dependencies and generated runs
 /CaPtain-Harness/
+/omni_harness/
+/benchmarks/
 /.venv*/
+/.vscode/
 /runs/
 __pycache__/
 *.py[cod]
@@ -24,6 +27,7 @@ __pycache__/
 # Recordings and archives
 *.mp4
 *.gif
+!/results/libero-object-20261126/replays/**/pick-place.gif
 *.log
 *.tar.gz
 *.zip

@@ -3,24 +3,33 @@
 from __future__ import annotations
 
 import base64
-import io
+from dataclasses import dataclass
 import json
 from pathlib import Path
 
+from simulation.ball_vision import CameraFrame, estimate_ball
 from simulation.franka import FrankaBall, GraspError, GraspTrajectory
+
+TARGET_COLORS = {"orange_ball": "orange", "green_ball": "green"}
+MIN_LIFT_CM = 8
+MAX_LIFT_CM = 25
 
 TOOL_PARAMETERS = {
     "observe": {},
-    "plan_grasp": {"frame_id": {"type": "string"},
-                   "target": {"type": "string", "enum": ["orange_ball"]}},
+    "plan_grasp": {
+        "frame_id": {"type": "string"},
+        "target": {"type": "string", "enum": list(TARGET_COLORS)},
+        "lift_cm": {"type": "number", "minimum": MIN_LIFT_CM, "maximum": MAX_LIFT_CM,
+                    "description": "Requested vertical rise from the ball's starting position, in centimeters."},
+    },
     "execute": {"plan_id": {"type": "string"}},
     "verify_grasp": {"plan_id": {"type": "string"}},
 }
 TOOL_DESCRIPTIONS = {
-    "observe": "Read the current RGB camera image and get its frame_id. Call this first.",
-    "plan_grasp": "Plan a grasp for orange_ball using the latest observed frame_id. The robot stays still.",
+    "observe": "Read synchronized overview and wrist RGB images with one shared frame_id. Call this first.",
+    "plan_grasp": "Estimate the selected ball from both RGB views of the latest frame_id, and plan a grasp and vertical lift without moving the arm.",
     "execute": "Run a prepared grasp plan by plan_id. The robot reaches, closes, lifts, and holds.",
-    "verify_grasp": "Check the current camera and gripper after executing plan_id.",
+    "verify_grasp": "Check whether the target ball is held and has reached the requested lift using fresh RGB images and gripper state.",
 }
 TOOL_SCHEMAS = [
     {"type": "function", "name": name, "description": TOOL_DESCRIPTIONS[name],
@@ -30,33 +39,56 @@ TOOL_SCHEMAS = [
 ]
 
 
+@dataclass(frozen=True)
+class PlannedGrasp:
+    trajectory: GraspTrajectory
+    target: str
+    lift_cm: float
+
+
 class GraspTools:
     def __init__(self, sim: FrankaBall, out: Path):
         self.sim = sim
         self.out = out
         self.frame_number = 0
-        self.latest_frame = None
-        self.plans: dict[str, GraspTrajectory] = {}
+        self.latest_frame: tuple[str, tuple[CameraFrame, CameraFrame], int] | None = None
+        self.plans: dict[str, PlannedGrasp] = {}
         self.executed_plan: str | None = None
 
-    def observe(self) -> tuple[dict, Path]:
-        frame = self.sim.observe("detail")
+    def _capture(self, suffix: str = "") -> tuple[dict, tuple[CameraFrame, CameraFrame], dict[str, Path]]:
+        frames = self.sim.observe_pair()
         self.frame_number += 1
         frame_id = f"f{self.frame_number}"
-        image = self.out / f"{frame_id}.jpg"
-        frame.image.save(image, quality=89)
-        self.latest_frame = (frame_id, frame, self.sim.steps)
-        return {"frame_id": frame_id, "camera": frame.camera, "image": image.name}, image
+        images = {}
+        for frame in frames:
+            path = self.out / f"{frame_id}{suffix}-{frame.camera}.jpg"
+            frame.image.save(path, quality=92)
+            images[frame.camera] = path
+        return {"frame_id": frame_id, "images": {camera: path.name for camera, path in images.items()}}, frames, images
 
-    def plan_grasp(self, frame_id: str, target: str) -> dict:
-        if target != "orange_ball":
-            raise GraspError("这个场景的可抓取对象是 orange_ball")
+    def observe(self) -> tuple[dict, dict[str, Path]]:
+        receipt, frames, images = self._capture()
+        self.latest_frame = (receipt["frame_id"], frames, self.sim.steps)
+        return receipt, images
+
+    def plan_grasp(self, frame_id: str, target: str, lift_cm: float) -> dict:
+        if target not in TARGET_COLORS:
+            raise GraspError("请选择可抓取对象 orange_ball 或 green_ball")
+        if type(lift_cm) not in (int, float) or not MIN_LIFT_CM <= lift_cm <= MAX_LIFT_CM:
+            raise GraspError(f"lift_cm 必须是 {MIN_LIFT_CM} 到 {MAX_LIFT_CM} 之间的数字，单位为厘米")
         if self.latest_frame is None or frame_id != self.latest_frame[0] or self.latest_frame[2] != self.sim.steps:
             raise GraspError("观测已过期，请先调用 observe 获取新的 frame_id")
-        plan = self.sim.plan_grasp(self.latest_frame[1].ball_center())
+        color = TARGET_COLORS[target]
+        estimate = estimate_ball(self.latest_frame[1], color=color)
+        trajectory = self.sim.plan_grasp(estimate, color=color, lift_m=lift_cm / 100)
         plan_id = f"p{len(self.plans) + 1}"
-        self.plans[plan_id] = plan
-        return {"plan_id": plan_id, "frame_id": frame_id, "motion": "接近、下降、闭合、抬升、保持"}
+        self.plans[plan_id] = PlannedGrasp(trajectory, target, lift_cm)
+        return {"plan_id": plan_id, "frame_id": frame_id, "target": target,
+                "requested_lift_cm": lift_cm, "motion": "接近、下降、闭合、垂直抬升、保持",
+                "ball_estimate": {"source": "two_rgb_views", "coordinate_frame": "world",
+                                  "color": color,
+                                  "center_m": [round(float(value), 4) for value in estimate.center],
+                                  "radius_m": round(float(estimate.radius), 4)}}
 
     def execute(self, plan_id: str) -> dict:
         if plan_id not in self.plans or plan_id != f"p{len(self.plans)}":
@@ -64,28 +96,33 @@ class GraspTools:
         if self.executed_plan == plan_id:
             raise GraspError("该计划已经执行，请直接调用 verify_grasp")
         self.executed_plan = plan_id
-        self.sim.execute_grasp(self.plans[plan_id])
-        return {"plan_id": plan_id, "motion_complete": True, "next": "verify_grasp"}
+        plan = self.plans[plan_id]
+        self.sim.execute_grasp(plan.trajectory)
+        return {"plan_id": plan_id, "target": plan.target, "requested_lift_cm": plan.lift_cm,
+                "motion_complete": True, "next": "verify_grasp"}
 
-    def verify_grasp(self, plan_id: str) -> tuple[dict, Path]:
+    def verify_grasp(self, plan_id: str) -> tuple[dict, dict[str, Path]]:
         if self.executed_plan != plan_id:
             raise GraspError("请先执行这个 plan_id")
-        result = self.sim.verify_grasp(self.plans[plan_id])
-        image = self.out / "verification.jpg"
-        self.sim.rgb(result.get("camera", "detail")).save(image, quality=92)
-        return {**result, "plan_id": plan_id, "image": image.name}, image
+        receipt, frames, images = self._capture("-verification")
+        plan = self.plans[plan_id]
+        result = self.sim.verify_grasp(plan.trajectory, frames)
+        return {**result, **receipt, "plan_id": plan_id, "target": plan.target,
+                "requested_lift_cm": plan.lift_cm}, images
 
-    def call(self, name: str, args: object) -> tuple[dict, Path | None]:
-        image = None
+    def call(self, name: str, args: object) -> tuple[dict, dict[str, Path]]:
+        images = {}
         try:
             parameters = TOOL_PARAMETERS.get(name)
             if parameters is None or not isinstance(args, dict) or set(args) != set(parameters):
                 raise GraspError("工具名或参数不在本实验的白名单里")
-            if any(not isinstance(value, str) for value in args.values()):
-                raise GraspError("工具参数必须是字符串")
+            for key, spec in parameters.items():
+                value = args[key]
+                if spec["type"] == "string" and not isinstance(value, str):
+                    raise GraspError(f"{key} 必须是字符串")
             value = getattr(self, name)(**args)
             if isinstance(value, tuple):
-                value, image = value
+                value, images = value
             result = {"ok": True, **value}
         except GraspError as error:
             result = {"ok": False, "error": str(error)}
@@ -93,12 +130,13 @@ class GraspTools:
             stream.write(json.dumps({"tool": name, "arguments": args, "receipt": result,
                                      "simulation_step": self.sim.steps}, ensure_ascii=False) + "\n")
         print(f"{name} → {json.dumps(result, ensure_ascii=False)}", flush=True)
-        return result, image
+        return result, images
 
 
-def receipt_content(receipt: dict, image: Path | None) -> list[dict]:
+def receipt_content(receipt: dict, images: dict[str, Path]) -> list[dict]:
     content = [{"type": "input_text", "text": json.dumps(receipt, ensure_ascii=False)}]
-    if image is not None:
+    for camera, image in images.items():
         encoded = base64.b64encode(image.read_bytes()).decode("ascii")
+        content.append({"type": "input_text", "text": f"{camera} RGB image ({image.name})"})
         content.append({"type": "input_image", "image_url": "data:image/jpeg;base64," + encoded})
     return content

@@ -1,0 +1,35 @@
+{
+  "suite": "libero_object",
+  "task_index": 4,
+  "seed": 0,
+  "instruction": "pick up the ketchup and place it in the basket",
+  "model": "qwen3.5:4b",
+  "official_success": true,
+  "agent_visual_success": true,
+  "control_steps": 155,
+  "model_turns": 24,
+  "scored_in_source_run_only": true,
+  "replay_verification": {
+    "model_invocations": 0,
+    "official_success_matches": true,
+    "control_steps_match": true,
+    "identical_tool_events": 24,
+    "identical_rgb_files": 22,
+    "captured_checkpoints": 6,
+    "applied_stops": 0
+  },
+  "publication": {
+    "artifact": "pick-place.gif",
+    "view": "fixed camera with bottom-right wrist inset",
+    "source_width": 400,
+    "source_height": 300,
+    "source_frames": 156,
+    "source_sha256": "ac4ec388ed72cc6f902b6d55ccbf7a8b9666b1889c0db9c75d07d0a3ab07231e",
+    "width": 320,
+    "height": 240,
+    "frames": 79,
+    "total_duration_ms": 8400,
+    "frame_subsample_stride": 2,
+    "sha256": "5bbc3276cc86f70dcfe1ba8b11c5c4d63327880dddbb476ca4534a3ac11b84d2"
+  }
+}

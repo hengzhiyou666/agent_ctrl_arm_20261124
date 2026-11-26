@@ -1,0 +1,35 @@
+{
+  "suite": "libero_object",
+  "task_index": 7,
+  "seed": 0,
+  "instruction": "pick up the milk and place it in the basket",
+  "model": "qwen3.5:4b",
+  "official_success": true,
+  "agent_visual_success": true,
+  "control_steps": 189,
+  "model_turns": 38,
+  "scored_in_source_run_only": true,
+  "replay_verification": {
+    "model_invocations": 0,
+    "official_success_matches": true,
+    "control_steps_match": true,
+    "identical_tool_events": 38,
+    "identical_rgb_files": 36,
+    "captured_checkpoints": 9,
+    "applied_stops": 0
+  },
+  "publication": {
+    "artifact": "pick-place.gif",
+    "view": "fixed camera with bottom-right wrist inset",
+    "source_width": 400,
+    "source_height": 300,
+    "source_frames": 190,
+    "source_sha256": "5c0b44696f52f3afe227acca4a68036ee4dd2d951cf4170a6275f6a14646d96f",
+    "width": 320,
+    "height": 240,
+    "frames": 96,
+    "total_duration_ms": 10100,
+    "frame_subsample_stride": 2,
+    "sha256": "6c13271a7a86d193bc2d35fa0e6badc3cbaab00dd0b7f3791b8c0098d9bc3a6c"
+  }
+}

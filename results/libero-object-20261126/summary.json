@@ -1,0 +1,138 @@
+{
+  "suite": "libero_object",
+  "complete": true,
+  "full_evaluation": true,
+  "stop_reason": null,
+  "overall": {
+    "planned": 500,
+    "scored": 500,
+    "successes": 496,
+    "failures": 4,
+    "agent_loops_completed": 493,
+    "infrastructure_errors": 0,
+    "pending": 0,
+    "success_rate": 0.992
+  },
+  "tasks": [
+    {
+      "task_id": 0,
+      "instruction": "pick up the alphabet soup and place it in the basket",
+      "planned": 50,
+      "scored": 50,
+      "successes": 50,
+      "failures": 0,
+      "agent_loops_completed": 50,
+      "infrastructure_errors": 0,
+      "pending": 0,
+      "success_rate": 1.0
+    },
+    {
+      "task_id": 1,
+      "instruction": "pick up the cream cheese and place it in the basket",
+      "planned": 50,
+      "scored": 50,
+      "successes": 48,
+      "failures": 2,
+      "agent_loops_completed": 48,
+      "infrastructure_errors": 0,
+      "pending": 0,
+      "success_rate": 0.96
+    },
+    {
+      "task_id": 2,
+      "instruction": "pick up the salad dressing and place it in the basket",
+      "planned": 50,
+      "scored": 50,
+      "successes": 50,
+      "failures": 0,
+      "agent_loops_completed": 50,
+      "infrastructure_errors": 0,
+      "pending": 0,
+      "success_rate": 1.0
+    },
+    {
+      "task_id": 3,
+      "instruction": "pick up the bbq sauce and place it in the basket",
+      "planned": 50,
+      "scored": 50,
+      "successes": 49,
+      "failures": 1,
+      "agent_loops_completed": 49,
+      "infrastructure_errors": 0,
+      "pending": 0,
+      "success_rate": 0.98
+    },
+    {
+      "task_id": 4,
+      "instruction": "pick up the ketchup and place it in the basket",
+      "planned": 50,
+      "scored": 50,
+      "successes": 50,
+      "failures": 0,
+      "agent_loops_completed": 50,
+      "infrastructure_errors": 0,
+      "pending": 0,
+      "success_rate": 1.0
+    },
+    {
+      "task_id": 5,
+      "instruction": "pick up the tomato sauce and place it in the basket",
+      "planned": 50,
+      "scored": 50,
+      "successes": 50,
+      "failures": 0,
+      "agent_loops_completed": 49,
+      "infrastructure_errors": 0,
+      "pending": 0,
+      "success_rate": 1.0
+    },
+    {
+      "task_id": 6,
+      "instruction": "pick up the butter and place it in the basket",
+      "planned": 50,
+      "scored": 50,
+      "successes": 49,
+      "failures": 1,
+      "agent_loops_completed": 49,
+      "infrastructure_errors": 0,
+      "pending": 0,
+      "success_rate": 0.98
+    },
+    {
+      "task_id": 7,
+      "instruction": "pick up the milk and place it in the basket",
+      "planned": 50,
+      "scored": 50,
+      "successes": 50,
+      "failures": 0,
+      "agent_loops_completed": 50,
+      "infrastructure_errors": 0,
+      "pending": 0,
+      "success_rate": 1.0
+    },
+    {
+      "task_id": 8,
+      "instruction": "pick up the chocolate pudding and place it in the basket",
+      "planned": 50,
+      "scored": 50,
+      "successes": 50,
+      "failures": 0,
+      "agent_loops_completed": 50,
+      "infrastructure_errors": 0,
+      "pending": 0,
+      "success_rate": 1.0
+    },
+    {
+      "task_id": 9,
+      "instruction": "pick up the orange juice and place it in the basket",
+      "planned": 50,
+      "scored": 50,
+      "successes": 50,
+      "failures": 0,
+      "agent_loops_completed": 48,
+      "infrastructure_errors": 0,
+      "pending": 0,
+      "success_rate": 1.0
+    }
+  ]
+}

@@ -1,0 +1,35 @@
+{
+  "suite": "libero_object",
+  "task_index": 8,
+  "seed": 0,
+  "instruction": "pick up the chocolate pudding and place it in the basket",
+  "model": "qwen3.5:4b",
+  "official_success": true,
+  "agent_visual_success": true,
+  "control_steps": 156,
+  "model_turns": 22,
+  "scored_in_source_run_only": true,
+  "replay_verification": {
+    "model_invocations": 0,
+    "official_success_matches": true,
+    "control_steps_match": true,
+    "identical_tool_events": 22,
+    "identical_rgb_files": 22,
+    "captured_checkpoints": 6,
+    "applied_stops": 0
+  },
+  "publication": {
+    "artifact": "pick-place.gif",
+    "view": "fixed camera with bottom-right wrist inset",
+    "source_width": 400,
+    "source_height": 300,
+    "source_frames": 157,
+    "source_sha256": "815a197864590e22bfd08e47cf79fd840b05b1eb6b5131f8fb3af37e9a235504",
+    "width": 320,
+    "height": 240,
+    "frames": 79,
+    "total_duration_ms": 8450,
+    "frame_subsample_stride": 2,
+    "sha256": "d4a599f67905f1c5d03c224c551734aa38fa5f16b32674af61a17b3e00ceede8"
+  }
+}

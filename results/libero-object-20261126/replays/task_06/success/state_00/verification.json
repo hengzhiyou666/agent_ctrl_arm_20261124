@@ -1,0 +1,35 @@
+{
+  "suite": "libero_object",
+  "task_index": 6,
+  "seed": 0,
+  "instruction": "pick up the butter and place it in the basket",
+  "model": "qwen3.5:4b",
+  "official_success": true,
+  "agent_visual_success": true,
+  "control_steps": 163,
+  "model_turns": 23,
+  "scored_in_source_run_only": true,
+  "replay_verification": {
+    "model_invocations": 0,
+    "official_success_matches": true,
+    "control_steps_match": true,
+    "identical_tool_events": 23,
+    "identical_rgb_files": 22,
+    "captured_checkpoints": 6,
+    "applied_stops": 0
+  },
+  "publication": {
+    "artifact": "pick-place.gif",
+    "view": "fixed camera with bottom-right wrist inset",
+    "source_width": 400,
+    "source_height": 300,
+    "source_frames": 164,
+    "source_sha256": "9451e755379652e85093c72c8a4d6fe8596f03384c007b9a8ecf0719e2b78877",
+    "width": 320,
+    "height": 240,
+    "frames": 83,
+    "total_duration_ms": 8800,
+    "frame_subsample_stride": 2,
+    "sha256": "14fb4a7e829821a63e983f7db52ed9eab360c8782f8710dcbb42c6844d90dd28"
+  }
+}

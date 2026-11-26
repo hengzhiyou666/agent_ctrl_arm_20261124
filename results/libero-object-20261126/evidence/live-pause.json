@@ -1,0 +1,36 @@
+{
+  "official_task_index": 7,
+  "initial_state_index": 0,
+  "purpose": "live_stop_acceptance",
+  "provider_model": "qwen3.5:4b",
+  "wall_clock_pace_hz": 10.0,
+  "action_completed": false,
+  "action_executed": true,
+  "controller_message": "motion_guard_rejected",
+  "control_steps_at_stop": 13,
+  "interruption": {
+    "action_id": "milk-visible-stop",
+    "sampled_step": 1,
+    "processed_step": 13,
+    "response_id": "chatcmpl-162",
+    "decision": "cancel",
+    "reason": "A milk carton is visually identifiable on the floor to the right of the arm's path, and interruption is enabled.",
+    "age_seconds": 1.2046,
+    "interrupted_at_step": 13,
+    "controller_hold": {
+      "simulation_steps": 13,
+      "arm_target": "reset_to_measured_pose",
+      "gripper_target": "preserved",
+      "status": "cancelled"
+    }
+  },
+  "fresh_rgb": {
+    "overview": "pause-overview.png",
+    "wrist": "pause-wrist.png"
+  },
+  "fresh_capture_preserved_arm_pose": true,
+  "fresh_capture_preserved_step": true,
+  "gripper_still_open": true,
+  "guard_restored": true,
+  "execution_state_known": true
+}

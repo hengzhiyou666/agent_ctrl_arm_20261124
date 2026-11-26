@@ -1,0 +1,72 @@
+{
+  "suite": "libero_object",
+  "task_index": 1,
+  "seed": 49,
+  "instruction": "pick up the cream cheese and place it in the basket",
+  "model": "qwen3.5:4b",
+  "official_success": false,
+  "agent_visual_success": false,
+  "control_steps": 280,
+  "model_turns": 44,
+  "failure_reason": "The agent reached the 44-turn budget. Last rejected action: A grasp may still be held. Use its lift waypoint or deliberately release before retreating.",
+  "scored_in_source_run_only": true,
+  "replay_verification": {
+    "model_invocations": 0,
+    "official_success_matches": true,
+    "control_steps_match": true,
+    "identical_tool_events": 40,
+    "mask_pixel_variations": [
+      {
+        "turn": 14,
+        "original_pixels": 478,
+        "replay_pixels": 477
+      },
+      {
+        "turn": 27,
+        "original_pixels": 477,
+        "replay_pixels": 478
+      }
+    ],
+    "mask_axis_variations": [
+      {
+        "turn": 15,
+        "original_axis": [
+          -1.0,
+          -0.009
+        ],
+        "replay_axis": [
+          -1.0,
+          -0.008
+        ]
+      },
+      {
+        "turn": 28,
+        "original_axis": [
+          -1.0,
+          -0.008
+        ],
+        "replay_axis": [
+          -1.0,
+          -0.009
+        ]
+      }
+    ],
+    "identical_rgb_files": 36,
+    "captured_checkpoints": 11,
+    "applied_stops": 0
+  },
+  "publication": {
+    "artifact": "pick-place.gif",
+    "view": "fixed camera with bottom-right wrist inset",
+    "source_width": 400,
+    "source_height": 300,
+    "source_frames": 281,
+    "source_sha256": "dc3175a075230fb261d762b55231bac708cb5c8f8cba67dab3554cde0e8fe5da",
+    "width": 320,
+    "height": 240,
+    "frames": 141,
+    "total_duration_ms": 14650,
+    "frame_subsample_stride": 2,
+    "sha256": "3728890c61e654a68c1b22ffaccd0b2580a64ef94faa3572705281504053f19a"
+  }
+}

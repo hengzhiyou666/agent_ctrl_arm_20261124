@@ -1,0 +1,43 @@
+{
+  "suite": "libero_object",
+  "task_index": 1,
+  "seed": 1,
+  "instruction": "pick up the cream cheese and place it in the basket",
+  "model": "qwen3.5:4b",
+  "official_success": false,
+  "agent_visual_success": false,
+  "control_steps": 280,
+  "model_turns": 44,
+  "failure_reason": "The agent reached the 44-turn budget. Last rejected action: LIBERO horizon exhausted",
+  "scored_in_source_run_only": true,
+  "replay_verification": {
+    "model_invocations": 0,
+    "official_success_matches": true,
+    "control_steps_match": true,
+    "identical_tool_events": 43,
+    "mask_pixel_variations": [
+      {
+        "turn": 25,
+        "original_pixels": 472,
+        "replay_pixels": 476
+      }
+    ],
+    "identical_rgb_files": 34,
+    "captured_checkpoints": 8,
+    "applied_stops": 0
+  },
+  "publication": {
+    "artifact": "pick-place.gif",
+    "view": "fixed camera with bottom-right wrist inset",
+    "source_width": 400,
+    "source_height": 300,
+    "source_frames": 281,
+    "source_sha256": "7f4f83ac01e6180285dd12f59f4aa0c2b481912d7e0903f0b39c4513b8dee543",
+    "width": 320,
+    "height": 240,
+    "frames": 141,
+    "total_duration_ms": 14650,
+    "frame_subsample_stride": 2,
+    "sha256": "d617001dc030509f561a32a74e79346453ea3327e837e76db2ba409a7c0c349d"
+  }
+}

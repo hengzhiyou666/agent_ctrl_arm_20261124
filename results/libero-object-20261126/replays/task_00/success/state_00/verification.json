@@ -1,0 +1,35 @@
+{
+  "suite": "libero_object",
+  "task_index": 0,
+  "seed": 0,
+  "instruction": "pick up the alphabet soup and place it in the basket",
+  "model": "qwen3.5:4b",
+  "official_success": true,
+  "agent_visual_success": true,
+  "control_steps": 167,
+  "model_turns": 22,
+  "scored_in_source_run_only": true,
+  "replay_verification": {
+    "model_invocations": 0,
+    "official_success_matches": true,
+    "control_steps_match": true,
+    "identical_tool_events": 22,
+    "identical_rgb_files": 22,
+    "captured_checkpoints": 6,
+    "applied_stops": 0
+  },
+  "publication": {
+    "artifact": "pick-place.gif",
+    "view": "fixed camera with bottom-right wrist inset",
+    "source_width": 400,
+    "source_height": 300,
+    "source_frames": 168,
+    "source_sha256": "c2dcb8dda3773d0794f4900f834c8f21ecb310f97d0be5e752c67bd36172fb5c",
+    "width": 320,
+    "height": 240,
+    "frames": 85,
+    "total_duration_ms": 9000,
+    "frame_subsample_stride": 2,
+    "sha256": "5cff4654e2ecbf1ed116b01b9666588c20914bce23bf6fd6211888c31a9a06c3"
+  }
+}

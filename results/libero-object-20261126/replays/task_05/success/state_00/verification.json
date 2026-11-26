@@ -1,0 +1,36 @@
+{
+  "suite": "libero_object",
+  "task_index": 5,
+  "seed": 0,
+  "instruction": "pick up the tomato sauce and place it in the basket",
+  "model": "qwen3.5:4b",
+  "official_success": true,
+  "agent_visual_success": true,
+  "control_steps": 147,
+  "model_turns": 24,
+  "scored_in_source_run_only": true,
+  "replay_verification": {
+    "model_invocations": 0,
+    "official_success_matches": true,
+    "control_steps_match": true,
+    "identical_tool_events": 24,
+    "mask_pixel_variations": [],
+    "identical_rgb_files": 22,
+    "captured_checkpoints": 6,
+    "applied_stops": 0
+  },
+  "publication": {
+    "artifact": "pick-place.gif",
+    "view": "fixed camera with bottom-right wrist inset",
+    "source_width": 400,
+    "source_height": 300,
+    "source_frames": 148,
+    "source_sha256": "9f525237180682193ee9ee52a6a7121978196617a11d2c9b3fefcffcf1f36dfd",
+    "width": 320,
+    "height": 240,
+    "frames": 75,
+    "total_duration_ms": 8000,
+    "frame_subsample_stride": 2,
+    "sha256": "3f8c7202f4ad9bbe1b4885fb91bcb6128177f8ba58d14ae125dbc4057ad1d551"
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "suite": "libero_object",
+  "task_index": 1,
+  "seed": 0,
+  "instruction": "pick up the cream cheese and place it in the basket",
+  "model": "qwen3.5:4b",
+  "official_success": true,
+  "agent_visual_success": true,
+  "control_steps": 151,
+  "model_turns": 23,
+  "scored_in_source_run_only": true,
+  "replay_verification": {
+    "model_invocations": 0,
+    "official_success_matches": true,
+    "control_steps_match": true,
+    "identical_tool_events": 23,
+    "identical_rgb_files": 22,
+    "captured_checkpoints": 6,
+    "applied_stops": 0
+  },
+  "publication": {
+    "artifact": "pick-place.gif",
+    "view": "fixed camera with bottom-right wrist inset",
+    "source_width": 400,
+    "source_height": 300,
+    "source_frames": 152,
+    "source_sha256": "e002370e9bae668062b60796f426446921ec2ee31731298fe18a54335a29c5b7",
+    "width": 320,
+    "height": 240,
+    "frames": 77,
+    "total_duration_ms": 8200,
+    "frame_subsample_stride": 2,
+    "sha256": "150e20a3b7398def93b766380f1a043270f24eff7f471420efc7fe3af6a4b742"
+  }
+}

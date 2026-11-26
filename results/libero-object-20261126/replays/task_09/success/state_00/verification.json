@@ -1,0 +1,35 @@
+{
+  "suite": "libero_object",
+  "task_index": 9,
+  "seed": 0,
+  "instruction": "pick up the orange juice and place it in the basket",
+  "model": "qwen3.5:4b",
+  "official_success": true,
+  "agent_visual_success": true,
+  "control_steps": 169,
+  "model_turns": 34,
+  "scored_in_source_run_only": true,
+  "replay_verification": {
+    "model_invocations": 0,
+    "official_success_matches": true,
+    "control_steps_match": true,
+    "identical_tool_events": 34,
+    "identical_rgb_files": 32,
+    "captured_checkpoints": 8,
+    "applied_stops": 0
+  },
+  "publication": {
+    "artifact": "pick-place.gif",
+    "view": "fixed camera with bottom-right wrist inset",
+    "source_width": 400,
+    "source_height": 300,
+    "source_frames": 170,
+    "source_sha256": "0783b4acc633d2202124e68ead419266e87b4123e15b287ee10ffd34b4aa8cf0",
+    "width": 320,
+    "height": 240,
+    "frames": 86,
+    "total_duration_ms": 9100,
+    "frame_subsample_stride": 2,
+    "sha256": "c35342ead426afe182c4b023de8d0288bd6f1af9e03d60d5b36b5ec6c8e449ce"
+  }
+}

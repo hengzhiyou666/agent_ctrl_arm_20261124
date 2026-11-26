@@ -1,9 +1,10 @@
-"""Single-ball Franka Panda scene with a bounded, position-controlled grasp."""
+"""Franka Panda scene with calibrated RGB cameras and a bounded grasp."""
 
 from __future__ import annotations
 
 import math
 import os
+from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -17,72 +18,32 @@ if os.environ["MUJOCO_GL"] == "egl" and mesa.exists():
 import mujoco
 import numpy as np
 from PIL import Image
-from scipy import ndimage
-from scipy.optimize import least_squares
 from scipy.spatial.transform import Rotation
 
+from simulation.ball_vision import BallEstimate, CameraFrame, GraspError, estimate_ball, estimate_ball_from_radius
+from simulation.replay import overlay_wrist_view
+
 HOME = np.array([0.0, 0.0, 0.0, -1.57079, 0.0, 1.57079, -0.7853])
-BALL_RADIUS = 0.024
 MIN_LIFT = 0.08
+MAX_LIFT = 0.25
+DEFAULT_LIFT = 0.155
+HEIGHT_TOLERANCE = 0.01
+VERTICAL_TOLERANCE = 0.01
+LIFT_CORRECTION_THRESHOLD = 0.0025
+MAX_LIFT_CORRECTION = 0.015
 GRIP_OPEN = 255.0
 GRIP_CLOSED = 0.0
 VIDEO_MS = 50
-
-
-class GraspError(RuntimeError):
-    """A public, actionable error from the simulation or the planner."""
-
-
-@dataclass(frozen=True)
-class CameraFrame:
-    camera: str
-    image: Image.Image
-    depth: np.ndarray
-    focal: float
-    position: np.ndarray
-    rotation: np.ndarray
-
-    def ball_center(self) -> np.ndarray:
-        """Fit the known-radius orange ball to RGB-selected depth pixels."""
-        red, green, blue = np.asarray(self.image, dtype=np.float32).transpose(2, 0, 1)
-        mask = (red > 105) & (red > 1.35 * green) & (green > 34) & (green > 1.35 * blue)
-        labels, count = ndimage.label(mask)
-        if not count:
-            raise GraspError("相机没有看到橙色小球")
-        sizes = np.bincount(labels.ravel())[1:]
-        mask = labels == int(sizes.argmax() + 1)
-        if sizes.max() < 24:
-            raise GraspError("看见的橙色区域太小，无法可靠定位")
-        interior = ndimage.binary_erosion(mask)
-        if interior.sum() >= 16:
-            mask = interior
-        height, width = mask.shape
-        row, col = np.nonzero(mask & np.isfinite(self.depth) & (self.depth > 0.04))
-        if len(row) < 14:
-            raise GraspError("小球的有效深度点不足")
-        depth = self.depth[row, col].astype(float)
-        camera_points = np.column_stack(((col + 0.5 - width / 2) * depth / self.focal,
-                                        (row + 0.5 - height / 2) * depth / self.focal,
-                                        depth))
-        points = camera_points @ self.rotation.T + self.position
-        visible_surface = np.median(points, axis=0)
-        ray = visible_surface - self.position
-        initial = visible_surface + BALL_RADIUS * ray / np.linalg.norm(ray)
-
-        def sphere_error(center):
-            return np.linalg.norm(points - center, axis=1) - BALL_RADIUS
-
-        fit = least_squares(sphere_error, initial, bounds=(initial - 0.035, initial + 0.035),
-                            loss="soft_l1", f_scale=0.0015, max_nfev=35)
-        if not fit.success or np.median(np.abs(fit.fun)) > 0.004:
-            raise GraspError("橙色区域和小球的深度形状不一致")
-        return fit.x
+BALL_PARTS = {"orange": ("ball_free", "ball"), "green": ("green_ball_free", "green_ball_geom")}
 
 
 @dataclass(frozen=True)
 class GraspTrajectory:
     start_joints: np.ndarray
     center: np.ndarray
+    radius: float
+    color: str
+    lift_m: float
     approach: tuple[np.ndarray, ...]
     lower: tuple[np.ndarray, ...]
     lift: tuple[np.ndarray, ...]
@@ -91,19 +52,33 @@ class GraspTrajectory:
 class FrankaBall:
     """Simulate the Franka and expose camera frames and grasp execution."""
 
-    def __init__(self, ball_xy: tuple[float, float] = (0.49, 0.08)):
-        self.model = mujoco.MjModel.from_xml_path(str(Path(__file__).with_name("franka_ball.xml")))
+    def __init__(self, ball_xy: tuple[float, float] = (0.49, 0.08), *, ball_radius: float | None = None,
+                 green_xy: tuple[float, float] | None = None, green_radius: float | None = None):
+        scene = str(Path(__file__).with_name("franka_ball.xml"))
+        spec = mujoco.MjSpec.from_file(scene)
+        self.ball_colors = ("orange",) if green_xy is None else ("orange", "green")
+        if green_xy is None:
+            spec.delete(spec.body("green_ball"))
+        # The physical scene needs a size. The RGB estimator receives only camera frames.
+        for color, radius in zip(self.ball_colors, (ball_radius, green_radius)):
+            if radius is not None:
+                spec.geom(BALL_PARTS[color][1]).size[0] = radius
+                spec.body(f"{color}_ball").pos[2] = radius + 0.0005
+        self.model = spec.compile()
         self.data = mujoco.MjData(self.model)
         self.tcp = self.model.site("grasp_tcp").id
         self.gripper_bodies = {self.model.body(name).id for name in ("left_finger", "right_finger")}
         self.data.qpos[:9] = [*HOME, 0.04, 0.04]
         self.data.joint("ball_free").qpos[:2] = ball_xy
+        if green_xy is not None:
+            self.data.joint("green_ball_free").qpos[:2] = green_xy
         self.data.ctrl[:] = [*HOME, GRIP_OPEN]
         mujoco.mj_forward(self.model, self.data)
         self.down = self.data.site_xmat[self.tcp].reshape(3, 3).copy()
         self.renderer = mujoco.Renderer(self.model, height=480, width=640)
         self.frames: list[Image.Image] = []
         self.steps = 0
+        self.step_observer: Callable[[], None] | None = None
         self.record_every = round((VIDEO_MS / 1000) / self.model.opt.timestep)
         self._step_for(0.20, record=False)
 
@@ -116,22 +91,25 @@ class FrankaBall:
 
     def observe(self, camera: str) -> CameraFrame:
         image = self.rgb(camera)
-        self.renderer.enable_depth_rendering()
-        try:
-            depth = self.renderer.render().copy()
-        finally:
-            self.renderer.disable_depth_rendering()
         camera_id = self.model.camera(camera).id
         focal = image.height / (2 * math.tan(math.radians(self.model.cam_fovy[camera_id]) / 2))
         cam_rotation = self.data.cam_xmat[camera_id].reshape(3, 3) @ np.diag([1, -1, -1])
-        return CameraFrame(camera, image, depth, focal, self.data.cam_xpos[camera_id].copy(), cam_rotation)
+        return CameraFrame(camera, image, focal, self.data.cam_xpos[camera_id].copy(), cam_rotation)
+
+    def observe_pair(self) -> tuple[CameraFrame, CameraFrame]:
+        # Rendering does not advance the simulator. Both images sample the same state.
+        return self.observe("overview"), self.observe("wrist")
 
     def _record(self) -> None:
-        self.frames.append(self.rgb())
+        overview = self.rgb()
+        overlay_wrist_view(overview, self.rgb("wrist"))
+        self.frames.append(overview)
 
     def _step(self, *, record: bool = True) -> None:
         mujoco.mj_step(self.model, self.data)
         self.steps += 1
+        if self.step_observer is not None:
+            self.step_observer()
         if record and self.steps % self.record_every == 0:
             self._record()
 
@@ -163,7 +141,6 @@ class FrankaBall:
     def _clear_table(self, scratch: mujoco.MjData, first: np.ndarray, second: np.ndarray) -> None:
         table = self.model.geom("table").id
         arm_base = self.model.body("link0").id
-        ball_body = self.model.body("orange_ball").id
         samples = max(2, math.ceil(np.max(np.abs(first - second)) / 0.04))
         for part in np.linspace(0, 1, samples + 1):
             scratch.qpos[:7] = first + part * (second - first)
@@ -172,21 +149,23 @@ class FrankaBall:
                 if contact.geom1 != table and contact.geom2 != table:
                     continue
                 other = contact.geom2 if contact.geom1 == table else contact.geom1
-                if self.model.geom_bodyid[other] not in (arm_base, ball_body, 0):
+                if self.model.geom_bodyid[other] not in (arm_base, 0):
                     raise GraspError("规划会使机械臂碰到桌面")
 
-    def plan_grasp(self, center: np.ndarray) -> GraspTrajectory:
+    def plan_grasp(self, estimate: BallEstimate, *, color: str = "orange", lift_m: float = DEFAULT_LIFT) -> GraspTrajectory:
+        center, radius = estimate.center, estimate.radius
+        if color not in self.ball_colors or not MIN_LIFT <= lift_m <= MAX_LIFT:
+            raise GraspError("目标或抬升高度不在当前场景支持范围内")
         x, y, z = center
-        if not (0.34 <= x <= 0.65 and -0.23 <= y <= 0.23 and 0.018 <= z <= 0.041):
+        if not (0.34 <= x <= 0.65 and -0.23 <= y <= 0.23 and 0.014 <= z <= 0.046):
             raise GraspError("小球不在本工作台的可抓取区域")
-        scratch = mujoco.MjData(self.model)
-        scratch.qpos[7:9] = 0.04
-        # No ball state from the live simulator is used by the planner.
-        scratch.joint("ball_free").qpos[:3] = center
+        if not 0.012 <= radius <= 0.037 or abs(z - radius) > 0.012:
+            raise GraspError("估计尺寸超出夹爪能力，或球心高度与台面不符")
+        scratch = self._planning_state()
         first_joints = self.data.qpos[:7].copy()
         first_position = self.data.site_xpos[self.tcp].copy()
         above = center + np.array([0, 0, 0.135])
-        lift_to = center + np.array([0, 0, 0.155])
+        lift_to = center + np.array([0, 0, lift_m])
         targets = ((first_position, above), (above, center), (center, lift_to))
         joints = first_joints
         paths = []
@@ -199,7 +178,15 @@ class FrankaBall:
                 waypoints.append(goal)
                 joints = goal
             paths.append(tuple(waypoints))
-        return GraspTrajectory(first_joints, center, *paths)
+        return GraspTrajectory(first_joints, center, radius, color, lift_m, *paths)
+
+    def _planning_state(self) -> mujoco.MjData:
+        scratch = mujoco.MjData(self.model)
+        scratch.qpos[7:9] = 0.04
+        # Arm/table clearance uses known geometry. Goal objects are outside this check.
+        for index, ball_color in enumerate(self.ball_colors):
+            scratch.joint(BALL_PARTS[ball_color][0]).qpos[:3] = [2.0 + index, 0.0, 1.0]
+        return scratch
 
     def _follow(self, waypoints: tuple[np.ndarray, ...], seconds: float) -> None:
         start = self.data.ctrl[:7].copy()
@@ -229,40 +216,96 @@ class FrankaBall:
         self._step_for(0.22)
         self._follow(plan.lift, 0.9)
         self._step_for(0.75)
+        self._refine_lift(plan)
         self._record()
 
-    def verify_grasp(self, plan: GraspTrajectory) -> dict:
+    def _refine_lift(self, plan: GraspTrajectory) -> None:
+        measurement = self.verify_grasp(plan, self.observe_pair())
+        if measurement.get("held") is not True or measurement.get("vertical") is not True:
+            return
+        error = plan.lift_m - measurement["lift_cm"] / 100
+        if not LIFT_CORRECTION_THRESHOLD < abs(error) <= MAX_LIFT_CORRECTION:
+            return
+        start = plan.lift[-1]
+        target = plan.center + np.array([0, 0, plan.lift_m + error])
+        scratch = self._planning_state()
+        goal = self._solve_pose(scratch, start, target)
+        self._clear_table(scratch, start, goal)
+        self._follow((goal,), 0.35)
+
+    def verify_grasp(self, plan: GraspTrajectory, frames: tuple[CameraFrame, CameraFrame]) -> dict:
         aperture = float(self.data.qpos[7:9].sum())
-        for camera in ("detail", "overview"):
+        gripper = self.data.site_xpos[self.tcp]
+
+        def measure(center: np.ndarray, source: str) -> dict:
+            lift = center[2] - plan.center[2]
+            horizontal = np.linalg.norm(center[:2] - plan.center[:2])
+            distance = np.linalg.norm(center - gripper)
+            held = bool(lift >= 0.035 and distance < 0.045 and aperture > plan.radius)
+            return {"held": held, "lift_cm": round(float(lift) * 100, 2),
+                    "height_reached": bool(abs(lift - plan.lift_m) <= HEIGHT_TOLERANCE),
+                    "vertical": bool(horizontal <= VERTICAL_TOLERANCE),
+                    "horizontal_cm": round(float(horizontal) * 100, 2), "measurement_source": source}
+
+        try:
+            estimate = estimate_ball(frames, plan.color)
+        except GraspError:
+            estimate = None
+        if estimate is not None and abs(estimate.radius - plan.radius) <= 0.25 * plan.radius:
+            return measure(estimate.center, "dual_rgb")
+
+        # A finger can cut the silhouette in one view. A sufficiently visible
+        # other view can reuse the radius measured from the initial RGB pair.
+        for frame in reversed(frames):
             try:
-                center = self.observe(camera).ball_center()
+                center = estimate_ball_from_radius(frame, plan.radius, plan.color)
             except GraspError:
                 continue
-            lift = center[2] - plan.center[2]
-            distance = np.linalg.norm(center - self.data.site_xpos[self.tcp])
-            return {"held": bool(lift >= MIN_LIFT and distance < 0.045 and aperture > 0.018),
-                    "lift_cm": round(float(lift) * 100, 2), "camera": camera}
-        return {"held": None, "reason": "夹爪遮住了球，无法从相机确认"}
+            receipt = measure(center, f"{frame.camera}_rgb_with_measured_radius")
+            if receipt["held"]:
+                return receipt
+        if aperture < plan.radius:
+            return {"held": False, "reason": "夹爪开口小于估计的球半径"}
+        return {"held": None, "reason": "相机里可见的球体轮廓不足，无法确认抓持"}
 
 
 class GraspScorer:
     """Independent simulation-only verdict, never placed in a model receipt."""
 
-    def __init__(self, sim: FrankaBall):
+    def __init__(self, sim: FrankaBall, *, color: str = "orange", lift_m: float | None = None):
         self.sim = sim
-        self.initial_z = float(sim.data.body("orange_ball").xpos[2])
+        self.color = color
+        self.lift_m = lift_m
+        self.initial_positions = {name: sim.data.body(f"{name}_ball").xpos.copy() for name in sim.ball_colors}
+        self.max_horizontal = 0.0
+        self.max_other_displacement = 0.0
+        sim.step_observer = self.record_motion
+
+    def record_motion(self) -> None:
+        for color, initial in self.initial_positions.items():
+            delta = self.sim.data.body(f"{color}_ball").xpos - initial
+            if color == self.color:
+                self.max_horizontal = max(self.max_horizontal, math.hypot(delta[0], delta[1]))
+            else:
+                self.max_other_displacement = max(self.max_other_displacement, math.hypot(*delta))
 
     def evaluate(self) -> dict:
         sim = self.sim
-        ball = sim.model.geom("ball").id
+        joint, geom = BALL_PARTS[self.color]
+        ball = sim.model.geom(geom).id
         contact_with = set()
         for contact in sim.data.contact:
             if contact.geom1 == ball or contact.geom2 == ball:
                 other = contact.geom2 if contact.geom1 == ball else contact.geom1
                 contact_with.add(sim.model.geom_bodyid[other])
-        lift = float(sim.data.body("orange_ball").xpos[2] - self.initial_z)
+        lift = float(sim.data.body(f"{self.color}_ball").xpos[2] - self.initial_positions[self.color][2])
         both_fingers = sim.gripper_bodies.issubset(contact_with)
-        speed = float(np.linalg.norm(sim.data.joint("ball_free").qvel[:3]))
-        return {"success": bool(both_fingers and lift >= MIN_LIFT and speed < 0.08),
-                "lift_cm": round(lift * 100, 2), "both_fingers_in_contact": both_fingers,
-                "ball_speed_m_s": round(speed, 4)}
+        speed = float(np.linalg.norm(sim.data.joint(joint).qvel[:3]))
+        height_reached = lift >= MIN_LIFT if self.lift_m is None else abs(lift - self.lift_m) <= HEIGHT_TOLERANCE
+        vertical = self.max_horizontal <= VERTICAL_TOLERANCE
+        other_unchanged = self.max_other_displacement <= VERTICAL_TOLERANCE
+        return {"success": both_fingers and height_reached and vertical and other_unchanged and speed < 0.08,
+                "target": f"{self.color}_ball", "lift_cm": round(lift * 100, 2), "height_reached": height_reached,
+                "max_horizontal_cm": round(self.max_horizontal * 100, 2), "vertical": vertical,
+                "other_ball_max_displacement_cm": round(self.max_other_displacement * 100, 2),
+                "both_fingers_in_contact": both_fingers, "ball_speed_m_s": round(speed, 4)}

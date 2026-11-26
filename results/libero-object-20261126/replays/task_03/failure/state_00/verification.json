@@ -1,0 +1,36 @@
+{
+  "suite": "libero_object",
+  "task_index": 3,
+  "seed": 0,
+  "instruction": "pick up the bbq sauce and place it in the basket",
+  "model": "qwen3.5:4b",
+  "official_success": false,
+  "agent_visual_success": false,
+  "control_steps": 0,
+  "model_turns": 44,
+  "failure_reason": "The agent reached the 44-turn budget. Last rejected action: unknown frame_id; capture a frame with observe",
+  "scored_in_source_run_only": true,
+  "replay_verification": {
+    "model_invocations": 0,
+    "official_success_matches": true,
+    "control_steps_match": true,
+    "identical_tool_events": 44,
+    "identical_rgb_files": 44,
+    "captured_checkpoints": 0,
+    "applied_stops": 0
+  },
+  "publication": {
+    "artifact": "pick-place.gif",
+    "view": "fixed camera with bottom-right wrist inset",
+    "source_width": 400,
+    "source_height": 300,
+    "source_frames": 1,
+    "source_sha256": "eab0557d86f8a8fb31bfedc6472c025dd810b099640b9c47bf49c5ed0e64d20c",
+    "width": 320,
+    "height": 240,
+    "frames": 1,
+    "total_duration_ms": 650,
+    "frame_subsample_stride": 2,
+    "sha256": "b1d49a5dad8a4aab9629c739e8a7cc7832ae7f7451aca7bb0736376995f99fd7"
+  }
+}

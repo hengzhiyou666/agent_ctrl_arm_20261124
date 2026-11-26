@@ -1,6 +1,12 @@
-# agent_ctrl_arm_20261124
+# Qwen3.5-4B 控制 Franka 仿真抓球
 
-Franka Panda 在 MuJoCo 桌面上夹住一颗橙色小球，抬离桌面并保持。Qwen3.5-4B 从本机 Ollama 读取指令、相机画面和工具回执，每轮选择一个已定义的工具。
+## LIBERO-Object 评测
+
+Qwen3.5-4B 通过独立工具控制 Franka。10 道题各跑 50 个官方初始状态，通过 **496/500 局（99.2%）**。旧版在相同状态下通过 293/500 局（58.6%）。新版有 469 局获得相机核验确认。 [逐题成绩、逐局记录与双视角回放](results/libero-object-20261126/README.md) · [工具与评测说明](docs/tool_agent.md)
+
+## MuJoCo 抓球示例
+
+MuJoCo 桌面上有橙球和绿球。默认指令是「用爪子将绿色的小球垂直抬高20cm」。Qwen3.5-4B 通过本机 Ollama 读取指令、全局及腕部相机的 RGB 画面和工具回执，选择目标颜色、要求的高度和要调用的工具。
 
 ## 本机运行
 
@@ -16,12 +22,22 @@ python3 robotctl.py agent
 python3 robotctl.py scripted
 ```
 
+也可对调球的位置并改变绿球半径，验收程序能否从图像重新估计球的位置和尺寸。
+
+```bash
+python3 robotctl.py scripted --ball-xy 0.46 -0.11 --green-xy 0.49 0.08 --green-radius 0.032
+```
+
+用 `--single-ball` 复现旧橙球场景。`--target` 和 `--lift-cm` 指定验收任务，`--instruction` 可改写给模型的指令。
+
 每局输出到 `runs/` 的独立目录。终端会显示实际的工具调用和回执。
 
 | 文件 | 内容 |
 | --- | --- |
-| `grasp.gif` | 仿真相机录到的连续画面 |
+| `grasp.gif` | 全局视角的连续回放，右下角显示同步腕部画面 |
 | `detail.png` | 结束时的夹爪近景 |
+| `f1-overview.jpg`、`f1-wrist.jpg` | 同一时刻的全局和腕部 RGB，作为 Agent 的观察输入 |
+| `f2-verification-overview.jpg`、`f2-verification-wrist.jpg` | 抓取完成后用于核验的两张图 |
 | `events.jsonl` | 每次工具调用及回执 |
 | `result.json` | 从相机得到的核验，以及独立物理评分 |
 
@@ -45,8 +61,8 @@ Ollama 保存模型权重，仓库保存仿真场景、机械臂的小型网格�
 
 - `robotctl.py` 启动一局，连接模拟器和 Agent，保存回放与评分。
 - `harness/` 复用 CaPtain 的模型客户端。Agent 可以调用 `observe`、`plan_grasp`、`execute` 和 `verify_grasp`。工具检查参数及计划编号。抓取轨迹由 Python 服务内的固定程序计算和执行。
-- `simulation/` 放 Franka 场景和运动代码。球的位置由 RGB 颜色分割和深度测量估计。逆运动学计算关节目标，规划时检查机械臂会不会碰桌面，接着用夹爪的物理接触夹起小球。
+- `simulation/ball_vision.py` 从两张 RGB 图分割指定颜色的球形轮廓，用相机标定和三角测量估计球心、距离和半径。`simulation/franka.py` 用逆运动学计算关节目标，检查桌面碰撞，执行抓取和抬升，并根据图像核验做一次限幅高度微调。
 
-当前路线使用轻量 MuJoCo 桌面场景。识别限定为场景中已知尺寸的橙球，抓取限定在空桌面。模型能读相机与夹爪回执，物体的仿真真值留给独立评分器。评分同时检查抬升高度、两个手指的接触和球的速度。
+当前使用轻量 MuJoCo 桌面场景和理想相机标定。颜色和球形是识别条件，尺寸和位置由 RGB 估计。`--ball-radius` 和 `--green-radius` 只用于配置仿真物理。验收要求视觉复核通过，独立评分再检查指定球的抬升误差、双指接触、球速、全程横向偏移和另一球是否被扰动。高度误差、横向偏移及另一球的位移均以 1 厘米为验收上限。
 
 Franka Panda 的关节、惯性和碰撞模型源于 MuJoCo Menagerie。场景保留了所需的碰撞网格，并加上了桌面、橙球与相机。对应许可在 `simulation/LICENSE-franka-panda.txt`。[MuJoCo Menagerie](https://github.com/google-deepmind/mujoco_menagerie/tree/main/franka_emika_panda)

@@ -1,0 +1,37 @@
+{
+  "suite": "libero_object",
+  "task_index": 6,
+  "seed": 8,
+  "instruction": "pick up the butter and place it in the basket",
+  "model": "qwen3.5:4b",
+  "official_success": false,
+  "agent_visual_success": false,
+  "control_steps": 150,
+  "model_turns": 44,
+  "failure_reason": "The agent reached the 44-turn budget. Last rejected action: This frame is missing or stale. Use a new observe frame or omit frame_id.",
+  "scored_in_source_run_only": true,
+  "replay_verification": {
+    "model_invocations": 0,
+    "official_success_matches": true,
+    "control_steps_match": true,
+    "identical_tool_events": 44,
+    "mask_pixel_variations": [],
+    "identical_rgb_files": 32,
+    "captured_checkpoints": 7,
+    "applied_stops": 0
+  },
+  "publication": {
+    "artifact": "pick-place.gif",
+    "view": "fixed camera with bottom-right wrist inset",
+    "source_width": 400,
+    "source_height": 300,
+    "source_frames": 151,
+    "source_sha256": "3e3c3e3dc0bd95a18156ce944e7e7b28f3d1ea11d5de64abf486fa158b774847",
+    "width": 320,
+    "height": 240,
+    "frames": 76,
+    "total_duration_ms": 8150,
+    "frame_subsample_stride": 2,
+    "sha256": "1dd128558dc4e3403d2dafb350830985bfab5e741e87c709d1858167d53ac316"
+  }
+}

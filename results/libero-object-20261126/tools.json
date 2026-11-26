@@ -1,0 +1,570 @@
+[
+  {
+    "type": "function",
+    "name": "observe",
+    "description": "Capture fresh RGB from the overview, wrist, or both cameras. Returns a frame_id for grasp planning. The frame is valid for planning while the robot and scene are unchanged.",
+    "parameters": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "camera": {
+          "type": "string",
+          "enum": [
+            "overview",
+            "wrist",
+            "both"
+          ]
+        }
+      },
+      "required": [
+        "camera"
+      ]
+    }
+  },
+  {
+    "type": "function",
+    "name": "inspect_place",
+    "description": "Get fresh visual evidence for checking the placement. Choose the overview, wrist, or both cameras.",
+    "parameters": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "camera": {
+          "type": "string",
+          "enum": [
+            "overview",
+            "wrist",
+            "both"
+          ]
+        }
+      },
+      "required": [
+        "camera"
+      ]
+    }
+  },
+  {
+    "type": "function",
+    "name": "detect_object",
+    "description": "Find the named object in the current RGB frame. Use after observe. Returns detection_id, the camera name, and an image with a box on the target.",
+    "parameters": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "frame_id": {
+          "type": "string"
+        },
+        "target": {
+          "type": "string",
+          "enum": [
+            "alphabet_soup",
+            "cream_cheese",
+            "salad_dressing",
+            "bbq_sauce",
+            "ketchup",
+            "tomato_sauce",
+            "butter",
+            "milk",
+            "chocolate_pudding",
+            "orange_juice"
+          ]
+        }
+      },
+      "required": [
+        "frame_id",
+        "target"
+      ]
+    }
+  },
+  {
+    "type": "function",
+    "name": "segment_object",
+    "description": "Mark the target's visible foreground pixels inside its detection. Use to isolate it from neighbours or to select its depth pixels. Returns mask_id and a mask overlay image.",
+    "parameters": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "detection_id": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "detection_id"
+      ]
+    }
+  },
+  {
+    "type": "function",
+    "name": "locate_object",
+    "description": "Estimate the detected object's 3D centre in robot base coordinates. Use before proposing a grasp. Optionally pass mask_id and depth_id from the same frame to refine the estimate. Returns object_id.",
+    "parameters": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "detection_id": {
+          "type": "string"
+        },
+        "mask_id": {
+          "type": "string"
+        },
+        "depth_id": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "detection_id"
+      ]
+    }
+  },
+  {
+    "type": "function",
+    "name": "locate_basket",
+    "description": "Find the basket in the current overview RGB frame and estimate its rim centre. Use before planning a transfer to the basket. Returns destination_id for plan_motion.",
+    "parameters": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "frame_id": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "frame_id"
+      ]
+    }
+  },
+  {
+    "type": "function",
+    "name": "estimate_depth",
+    "description": "Estimate sparse metric depth from the two RGB views in a frame. Call when object distance is uncertain. The depth ID belongs to the selected camera, and missing stereo points remain unknown.",
+    "parameters": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "frame_id": {
+          "type": "string"
+        },
+        "camera": {
+          "type": "string",
+          "enum": [
+            "overview",
+            "wrist"
+          ]
+        }
+      },
+      "required": [
+        "frame_id",
+        "camera"
+      ]
+    }
+  },
+  {
+    "type": "function",
+    "name": "move_wrist_view",
+    "description": "Move the wrist camera to a selected angle above a localized, stationary object. Choose left and right for different angles and call observe with wrist after each move. Use when a single view leaves the shape or grasp uncertain.",
+    "parameters": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "object_id": {
+          "type": "string",
+          "description": "Current object ID from locate_object. Defaults to the latest current localization of the task target."
+        },
+        "view": {
+          "type": "string",
+          "enum": [
+            "left",
+            "right",
+            "center"
+          ]
+        }
+      },
+      "required": [
+        "view"
+      ]
+    }
+  },
+  {
+    "type": "function",
+    "name": "reconstruct_shape",
+    "description": "Fuse the latest wrist RGB from each distinct view of the selected stationary object. Use after choosing at least two views and capturing wrist RGB at each. Returns a shape ID, visible 3D points and measurement quality. No movement occurs.",
+    "parameters": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "object_id": {
+          "type": "string",
+          "description": "Target ID returned by locate_object before the wrist views."
+        }
+      },
+      "required": [
+        "object_id"
+      ]
+    }
+  },
+  {
+    "type": "function",
+    "name": "estimate_weight",
+    "description": "Estimate a package's possible empty and filled mass from its RGB category and declared dimensions. Use after locate_object when payload could affect a grasp. Returns a load_id and the assumptions, or unknown.",
+    "parameters": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "object_id": {
+          "type": "string",
+          "description": "The localized target's object_id."
+        }
+      },
+      "required": [
+        "object_id"
+      ]
+    }
+  },
+  {
+    "type": "function",
+    "name": "estimate_grip_force",
+    "description": "Estimate the normal force each finger would need to resist gravity during a symmetric vertical lift. Use after proposing a grasp and estimating its load. Returns a range in newtons with friction assumptions. The LIBERO controller cannot use this range as a force command. Check grip retention independently.",
+    "parameters": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "grasp_id": {
+          "type": "string",
+          "description": "The candidate to assess, from propose_grasps."
+        },
+        "load_id": {
+          "type": "string",
+          "description": "The estimated load for the same object, from estimate_weight."
+        }
+      },
+      "required": [
+        "grasp_id",
+        "load_id"
+      ]
+    }
+  },
+  {
+    "type": "function",
+    "name": "find_ridge",
+    "description": "Find a visible roof edge on a located milk or orange-juice carton. Returns a provisional 3D midpoint and jaw closing direction, or uncertainty. Use before proposing a roof pinch.",
+    "parameters": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "object_id": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "object_id"
+      ]
+    }
+  },
+  {
+    "type": "function",
+    "name": "get_gripper_spec",
+    "description": "Read the Panda gripper's maximum pad gap, finger dimensions and usable grasping clearance. Use when deciding how wide an object or its narrow section may be grabbed.",
+    "parameters": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "type": "function",
+    "name": "propose_grasps",
+    "description": "Propose top-down grasp positions and jaw angles for a localized object. Pass shape_id from reconstruct_shape to use measured cross-sections and distinguish observed from inferred contacts. A roof edge from find_ridge adds perpendicular and along-ridge pinches. Returns candidate IDs and recommended_grasp_id with the reason.",
+    "parameters": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "object_id": {
+          "type": "string"
+        },
+        "shape_id": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "object_id"
+      ]
+    }
+  },
+  {
+    "type": "function",
+    "name": "check_grasps",
+    "description": "Screen proposed grasps for pad opening, floor clearance, workspace bounds and endpoint IK when supported. Read the ranked candidates and recommended_grasp_id before selecting a grasp for plan_motion. Recommendations include evidence from any recent stalled descent near this object.",
+    "parameters": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "object_id": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "object_id"
+      ]
+    }
+  },
+  {
+    "type": "function",
+    "name": "plan_motion",
+    "description": "Build waypoints for one grasp candidate you selected after checking it. The available waypoints are pick_hover, grasp, lift. Pass a destination_id from locate_basket to add the basket waypoint. Returns a plan ID. The arm stays still.",
+    "parameters": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "grasp_id": {
+          "type": "string"
+        },
+        "destination_id": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "grasp_id"
+      ]
+    }
+  },
+  {
+    "type": "function",
+    "name": "move_arm",
+    "description": "Move to one waypoint: pick_hover approaches from above; grasp descends from that hover; lift raises after a close command; basket transfers after lift. Each call moves only the arm.",
+    "parameters": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "plan_id": {
+          "type": "string"
+        },
+        "waypoint": {
+          "type": "string",
+          "enum": [
+            "pick_hover",
+            "grasp",
+            "lift",
+            "basket"
+          ]
+        }
+      },
+      "required": [
+        "plan_id",
+        "waypoint"
+      ]
+    }
+  },
+  {
+    "type": "function",
+    "name": "retreat_arm",
+    "description": "Raise the open gripper vertically to clear the view after a blocked descent or after release. Use when the arm obscures the scene, then take a new picture.",
+    "parameters": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "type": "function",
+    "name": "test_lift",
+    "description": "After closing the fingers at a grasp, raise the hand by 4 cm at fixed orientation. Use to test a new or uncertain grip. Capture the wrist and check retention afterward. Reaching the lift position alone is not proof that the object moved.",
+    "parameters": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "plan_id": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "plan_id"
+      ]
+    }
+  },
+  {
+    "type": "function",
+    "name": "set_gripper",
+    "description": "Close at a reached grasp waypoint, or open at the current position. Open at the basket waypoint to release an object into the basket. Use camera evidence to check the object.",
+    "parameters": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "state": {
+          "type": "string",
+          "enum": [
+            "open",
+            "close"
+          ]
+        }
+      },
+      "required": [
+        "state"
+      ]
+    }
+  },
+  {
+    "type": "function",
+    "name": "get_gripper_state",
+    "description": "Read the measured gripper opening as a fraction from 0 (closed) to 1 (open), and recent command receipts.",
+    "parameters": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {},
+      "required": []
+    }
+  },
+  {
+    "type": "function",
+    "name": "check_grip",
+    "description": "Read the measured finger gap and latest wrist image. Use after closing, after lifting, or before release. Returns gripped, possible_grip, empty, uncertain, or no_active_grasp. Checks do not move the arm.",
+    "parameters": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "plan_id": {
+          "type": "string",
+          "description": "The grasp plan being checked."
+        },
+        "frame_id": {
+          "type": "string",
+          "description": "A current observe or inspect_place frame ID."
+        }
+      },
+      "required": [
+        "plan_id"
+      ]
+    }
+  },
+  {
+    "type": "function",
+    "name": "diagnose_drop",
+    "description": "Compare measured closure, lift, transfer and release evidence when pickup fails or the target drops. Returns an evidence-supported phase, possible causes and a retry option. Checks do not move the arm.",
+    "parameters": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "plan_id": {
+          "type": "string",
+          "description": "The grasp plan being checked."
+        },
+        "frame_id": {
+          "type": "string",
+          "description": "A current observe or inspect_place frame ID."
+        }
+      },
+      "required": [
+        "plan_id"
+      ]
+    }
+  },
+  {
+    "type": "function",
+    "name": "verify_place",
+    "description": "Check a fresh frame from inspect_place after opening at the basket. Match the target in the release plan. Returns inside when RGB supports placement, outside when the target remains at its source, or uncertain when evidence is unclear. Use this result before finish_task.",
+    "parameters": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "frame_id": {
+          "type": "string",
+          "description": "A fresh frame ID returned by inspect_place."
+        },
+        "target": {
+          "type": "string",
+          "enum": [
+            "alphabet_soup",
+            "cream_cheese",
+            "salad_dressing",
+            "bbq_sauce",
+            "ketchup",
+            "tomato_sauce",
+            "butter",
+            "milk",
+            "chocolate_pudding",
+            "orange_juice"
+          ],
+          "description": "Target name in the released grasp plan."
+        }
+      },
+      "required": [
+        "frame_id",
+        "target"
+      ]
+    }
+  },
+  {
+    "type": "function",
+    "name": "remember_attempt",
+    "description": "Save the executed evidence for one grasp plan in this episode. Use after a failed approach, loss of grip, or checked placement to compare retry choices. Optionally pass the diagnose_drop ID or verify_place frame ID. The saved record cites actual move, gripper and inspection receipts.",
+    "parameters": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "plan_id": {
+          "type": "string",
+          "description": "Executed plan ID returned by plan_motion."
+        },
+        "diagnosis_id": {
+          "type": "string",
+          "description": "Matching ID from diagnose_drop."
+        },
+        "verification_frame_id": {
+          "type": "string",
+          "description": "Matching frame evaluated by verify_place."
+        }
+      },
+      "required": [
+        "plan_id"
+      ]
+    }
+  },
+  {
+    "type": "function",
+    "name": "recall_attempts",
+    "description": "Recall up to five recently saved attempts for the target in this episode. Use before retrying to compare poses, motion failures, release evidence, or diagnosed grip loss and choose a backup.",
+    "parameters": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "target": {
+          "type": "string",
+          "description": "Target object ID named in the task, for example milk."
+        }
+      },
+      "required": [
+        "target"
+      ]
+    }
+  },
+  {
+    "type": "function",
+    "name": "finish_task",
+    "description": "Report placed when verify_place says inside on a new inspection frame. Report blocked with a reason if unable to proceed.",
+    "parameters": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "outcome": {
+          "type": "string",
+          "enum": [
+            "placed",
+            "blocked"
+          ]
+        },
+        "frame_id": {
+          "type": "string"
+        },
+        "reason": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "outcome",
+        "frame_id",
+        "reason"
+      ]
+    }
+  }
+]
